@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riddles and Brain Teasers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Baloo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Baloo 2', cursive;
+            background-color: #f0f9ff;
+            color: #1e3a8a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        .riddle-area, .answer-area, .theme-area, .feedback-area {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background-color: #e0f2fe;
+            border-radius: 15px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .feedback-area {
+            min-height: auto; /* Smaller height for feedback buttons */
+            padding: 1rem;
+        }
+        .riddle-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: #0c4a6e;
+            white-space: pre-line;
+        }
+        .answer-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #15803d;
+        }
+        .button {
+            background-color: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 0.5rem;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+        .button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        .button:active {
+            transform: translateY(0);
+        }
+        .button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .theme-button {
+            background-color: #fb923c;
+        }
+        .theme-button:hover {
+            background-color: #f97316;
+        }
+        .theme-button.selected {
+            background-color: #ea580c;
+            box-shadow: 0 0 0 3px #fdba74;
+        }
+        .feedback-button {
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+        }
+        .correct-button {
+            background-color: #22c55e; /* Green */
+        }
+        .correct-button:hover {
+            background-color: #16a34a;
+        }
+        .incorrect-button {
+            background-color: #f43f5e; /* Rose */
+        }
+        .incorrect-button:hover {
+            background-color: #e11d48;
+        }
+        .title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .loading-message, .error-message, .info-message {
+            margin-top: 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .loading-message { color: #0ea5e9; }
+        .error-message { color: #ef4444; }
+        .info-message { color: #6b7280; }
+        .emoji {
+            font-size: 2rem;
+            margin-top: 0.5rem;
+        }
+        .theme-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .footer-text {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        #resetSeenRiddlesBtn {
+            background-color: #6b7280;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+        }
+        #resetSeenRiddlesBtn:hover {
+            background-color: #4b5563;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 1.5rem 1rem; }
+            .title { font-size: 2.2rem; }
+            .riddle-text { font-size: 1.25rem; }
+            .answer-text { font-size: 1.15rem; }
+            .button { font-size: 1rem; padding: 0.6rem 1.2rem; }
+            .theme-selector { gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Riddles & Brain Teasers! 🧠✨</h1>
+
+        <div class="riddle-area">
+            <p id="riddleText" class="riddle-text">Click "New Riddle" to start!</p>
+        </div>
+
+        <button id="showAnswerBtn" class="button">Show Answer</button>
+        <button id="newRiddleBtn" class="button">New Initial Riddle</button>
+
+        <div class="answer-area">
+            <p id="answerText" class="answer-text"></p>
+            <p id="answerEmoji" class="emoji"></p>
+        </div>
+
+        <div id="feedbackArea" class="feedback-area" style="display: none;">
+            <p class="mb-2 text-lg font-medium">Did you get it right?</p>
+            <button id="gotItRightBtn" class="button feedback-button correct-button">Yes! 🎉</button>
+            <button id="missedItBtn" class="button feedback-button incorrect-button">Not this time 🙁</button>
+        </div>
+
+        <div class="theme-area">
+            <h2 class="text-xl font-semibold mb-3 text-indigo-700">Or, pick a theme for a new riddle:</h2>
+            <div id="themeSelector" class="theme-selector">
+                </div>
+            <button id="generateThemeRiddleBtn" class="button bg-green-500 hover:bg-green-600">Get AI Riddle by Theme!</button>
+        </div>
+
+        <div id="loadingMessage" class="loading-message" style="display: none;">Thinking of a tricky riddle... 🤔</div>
+        <div id="errorMessage" class="error-message" style="display: none;">Oops! Couldn't get a riddle. Try again!</div>
+        <div id="infoMessage" class="info-message" style="display: none;"></div>
+        <button id="resetSeenRiddlesBtn" class="button" title="Click to see all initial riddles again from the start.">Reset Seen Initial Riddles</button>
+    </div>
+
+    <p class="footer-text">Fun & Learning for ages 5-7!</p>
+
+    <script>
+        const riddleTextElement = document.getElementById('riddleText');
+        const answerTextElement = document.getElementById('answerText');
+        const answerEmojiElement = document.getElementById('answerEmoji');
+        const showAnswerBtn = document.getElementById('showAnswerBtn');
+        const newRiddleBtn = document.getElementById('newRiddleBtn');
+        const generateThemeRiddleBtn = document.getElementById('generateThemeRiddleBtn');
+        const themeSelectorElement = document.getElementById('themeSelector');
+        const loadingMessageElement = document.getElementById('loadingMessage');
+        const errorMessageElement = document.getElementById('errorMessage');
+        const infoMessageElement = document.getElementById('infoMessage');
+        const resetSeenRiddlesBtn = document.getElementById('resetSeenRiddlesBtn');
+
+        // Feedback elements
+        const feedbackAreaElement = document.getElementById('feedbackArea');
+        const gotItRightBtn = document.getElementById('gotItRightBtn');
+        const missedItBtn = document.getElementById('missedItBtn');
+
+        let currentRiddle = null;
+        let selectedTheme = null;
+        const SEEN_RIDDLES_KEY = 'seenRiddles_v1';
+
+        // Tone.js synths for sounds
+        let correctSynth, incorrectSynth;
+
+        // Initialize Tone.js synths safely after user interaction or on load
+        function initializeSynths() {
+            if (typeof Tone !== 'undefined') {
+                if (!correctSynth) {
+                    correctSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "triangle" },
+                        envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.2 }
+                    }).toDestination();
+                }
+                if (!incorrectSynth) {
+                    incorrectSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "square" },
+                        envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 },
+                        volume: -6 // Slightly quieter
+                    }).toDestination();
+                }
+            } else {
+                console.warn("Tone.js not loaded yet. Sounds will not play.");
+            }
+        }
+        // Call initializeSynths once, perhaps on first interaction or load
+        // It's good practice to start audio context on user gesture.
+        // For simplicity here, we'll try on load and rely on browser handling.
+         window.addEventListener('load', initializeSynths);
+
+
+        function playCorrectSound() {
+            if (correctSynth && Tone.context.state !== 'running') {
+                Tone.start(); // Ensure AudioContext is running
+            }
+            if (correctSynth) {
+                const now = Tone.now();
+                correctSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", now);
+                correctSynth.triggerAttackRelease("E5", "4n", now + 0.3);
+            } else {
+                console.log("Correct sound!"); // Fallback if Tone.js fails
+            }
+        }
+
+        function playIncorrectSound() {
+             if (incorrectSynth && Tone.context.state !== 'running') {
+                Tone.start();
+            }
+            if (incorrectSynth) {
+                const now = Tone.now();
+                incorrectSynth.triggerAttackRelease(["F#3", "F3"], "8n", now);
+                incorrectSynth.triggerAttackRelease("E3", "4n", now + 0.2);
+            } else {
+                console.log("Incorrect sound!"); // Fallback
+            }
+        }
+
+
+        const initialRiddles = [
+            { id: 1, riddle: "I have a long neck and spots all over.\nI love to eat leaves from the tallest trees.\nWhat am I?", answer: "A giraffe", emoji: "🦒", category: "Animals" },
+            { id: 2, riddle: "I am round and I bounce.\nYou can kick me or throw me.\nWhat am I?", answer: "A ball", emoji: "⚽", category: "Toys" },
+            { id: 3, riddle: "I have cities, but no houses.\nI have mountains, but no trees.\nI have water, but no fish.\nWhat am I?", answer: "A map", emoji: "🗺️", category: "Objects" },
+            { id: 4, riddle: "I say \"moo\" and give you milk.\nI like to eat grass in the field.\nWhat am I?", answer: "A cow", emoji: "🐄", category: "Animals" },
+            { id: 5, riddle: "You use me to write and to draw.\nI can be many different colors.\nIf I break, you can sharpen me.\nWhat am I?", answer: "A pencil or a crayon", emoji: "✏️", category: "School" },
+            { id: 6, riddle: "I have a face and two hands, but no arms or legs.\nI tell you something important all day long.\nWhat am I?", answer: "A clock", emoji: "⏰", category: "Household" },
+            { id: 7, riddle: "I fall from the sky but never get hurt.\nI make the plants grow and can make a puddle.\nWhat am I?", answer: "Rain", emoji: "🌧️", category: "Nature" },
+            { id: 8, riddle: "I have wings and I can fly.\nI chirp and build a nest in a tree.\nWhat am I?", answer: "A bird", emoji: "🐦", category: "Animals" },
+            { id: 9, riddle: "I am a fruit that is red and sweet.\nAn apple a day keeps the doctor away, they say!\nWhat am I?", answer: "An apple", emoji: "🍎", category: "Food" },
+            { id: 10, riddle: "I have a big, red nose and wear floppy shoes.\nI make people laugh with my silly tricks.\nWhat am I?", answer: "A clown", emoji: "🤡", category: "People" },
+            { id: 11, riddle: "I have a fluffy tail and I like to hop.\nI love carrots and wiggle my nose a lot.\nWhat am I?", answer: "A bunny", emoji: "🐰", category: "Animals" },
+            { id: 12, riddle: "I light up the sky at night.\nSometimes I'm full, sometimes a crescent.\nWhat am I?", answer: "The moon", emoji: "🌙", category: "Nature" },
+            { id: 13, riddle: "I have keys but open no locks.\nI have space but no room.\nYou can enter, but not go outside.\nWhat am I?", answer: "A keyboard", emoji: "⌨️", category: "Technology" },
+            { id: 14, riddle: "What has an eye, but cannot see?", answer: "A needle", emoji: "🧵", category: "Objects" },
+            { id: 15, riddle: "I am full of holes but still hold water.\nWhat am I?", answer: "A sponge", emoji: "🧽", category: "Household" },
+            { id: 16, riddle: "I have a horn but cannot beep.\nI am a mythical creature, often white and pure.\nWhat am I?", answer: "A unicorn", emoji: "🦄", category: "Fantasy" },
+            { id: 17, riddle: "I grow on a vine and can be red or green.\nYou can eat me or drink my juice.\nWhat am I?", answer: "Grapes", emoji: "🍇", category: "Food" },
+            { id: 18, riddle: "I have a mane and a mighty roar.\nI am known as the king of the jungle.\nWhat am I?", answer: "A lion", emoji: "🦁", category: "Animals" },
+            { id: 19, riddle: "I have a spine, but no bones.\nI am full of stories for you to explore.\nWhat am I?", answer: "A book", emoji: "📚", category: "Learning" },
+            { id: 20, riddle: "I have wheels and an engine, and take you places fast.\nBeep beep! Get out of my way!\nWhat am I?", answer: "A car", emoji: "🚗", category: "Vehicles" }
+        ];
+
+        const themes = [
+            { name: "Animals", emoji: "🐾" }, { name: "Food", emoji: "🍎" },
+            { name: "Nature", emoji: "🌳" }, { name: "Toys", emoji: "🧸" },
+            { name: "Vehicles", emoji: "🚗" }, { name: "Household", emoji: "🏠" },
+            { name: "Fantasy", emoji: "✨"}, { name: "Body Parts", emoji: "👂"}
+        ];
+
+        function getSeenRiddles() {
+            const seen = localStorage.getItem(SEEN_RIDDLES_KEY);
+            return seen ? JSON.parse(seen) : [];
+        }
+
+        function saveSeenRiddle(riddleId) {
+            let seen = getSeenRiddles();
+            if (!seen.includes(riddleId)) {
+                seen.push(riddleId);
+                localStorage.setItem(SEEN_RIDDLES_KEY, JSON.stringify(seen));
+            }
+        }
+
+        function displayRiddle(riddleObj) {
+            currentRiddle = riddleObj;
+            riddleTextElement.innerText = riddleObj.riddle;
+            answerTextElement.innerText = "";
+            answerEmojiElement.innerText = "";
+            showAnswerBtn.disabled = false;
+            errorMessageElement.style.display = 'none';
+            infoMessageElement.style.display = 'none';
+            feedbackAreaElement.style.display = 'none'; // Hide feedback buttons
+
+            if (riddleObj.id) {
+                saveSeenRiddle(riddleObj.id);
+            }
+        }
+
+        function showAnswer() {
+            if (currentRiddle) {
+                answerTextElement.innerText = currentRiddle.answer;
+                if (currentRiddle.emoji) {
+                    answerEmojiElement.innerText = currentRiddle.emoji;
+                }
+                showAnswerBtn.disabled = true;
+                feedbackAreaElement.style.display = 'flex'; // Show feedback buttons
+            }
+        }
+
+        function getNewInitialRiddle() {
+            initializeSynths(); // Ensure synths are ready
+            let seenRiddleIds = getSeenRiddles();
+            let availableRiddles = initialRiddles.filter(r => !seenRiddleIds.includes(r.id));
+
+            if (availableRiddles.length === 0 && initialRiddles.length > 0) {
+                infoMessageElement.innerText = "You've seen all our initial riddles! Resetting the list or try a themed riddle.";
+                infoMessageElement.style.display = 'block';
+                localStorage.removeItem(SEEN_RIDDLES_KEY);
+                seenRiddleIds = [];
+                availableRiddles = initialRiddles;
+            }
+             if (availableRiddles.length === 0 && initialRiddles.length > 0) {
+                displayRiddle({riddle: "Wow, you're a riddle master! Try generating a themed riddle.", answer: "Great job!", emoji: "🏆"});
+                return;
+            } else if (initialRiddles.length === 0) {
+                 displayRiddle({riddle: "No initial riddles loaded. Try a themed riddle!", answer: "", emoji: "🤔"});
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableRiddles.length);
+            displayRiddle(availableRiddles[randomIndex]);
+        }
+        
+        resetSeenRiddlesBtn.addEventListener('click', () => {
+            localStorage.removeItem(SEEN_RIDDLES_KEY);
+            infoMessageElement.innerText = "Seen initial riddles have been reset! You'll see them all again.";
+            infoMessageElement.style.display = 'block';
+            getNewInitialRiddle();
+        });
+
+        function populateThemes() {
+            themes.forEach(theme => {
+                const button = document.createElement('button');
+                button.classList.add('button', 'theme-button');
+                button.textContent = `${theme.name} ${theme.emoji}`;
+                button.onclick = () => {
+                    selectedTheme = theme.name;
+                    document.querySelectorAll('.theme-button').forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    infoMessageElement.style.display = 'none';
+                    feedbackAreaElement.style.display = 'none';
+                };
+                themeSelectorElement.appendChild(button);
+            });
+        }
+
+        async function generateRiddleByTheme() {
+            initializeSynths(); // Ensure synths are ready
+            if (!selectedTheme) {
+                errorMessageElement.innerText = "Please select a theme first!";
+                errorMessageElement.style.display = 'block';
+                return;
+            }
+
+            loadingMessageElement.style.display = 'block';
+            errorMessageElement.style.display = 'none';
+            infoMessageElement.style.display = 'none';
+            feedbackAreaElement.style.display = 'none';
+            riddleTextElement.innerText = "";
+            answerTextElement.innerText = "";
+            answerEmojiElement.innerText = "";
+            showAnswerBtn.disabled = true;
+            generateThemeRiddleBtn.disabled = true;
+
+            const prompt = `Create a simple, fun, and slightly educational riddle suitable for a 5 to 7-year-old child.
+The riddle should be about the theme: "${selectedTheme}".
+The riddle should be 2 to 4 lines long and use simple vocabulary.
+If possible, the riddle or its answer should subtly introduce or reinforce a simple concept, fact, or characteristic related to the theme that a child in this age group might be learning (e.g., what sound an animal makes, a color, a shape, a basic function of an object).
+Provide the answer as a short phrase.
+Optionally, suggest a single common emoji that represents the answer.
+
+Format the response strictly as a JSON object with the following keys: "riddle" (string), "answer" (string), and "emoji" (string, optional).
+Example for theme "Animals":
+{
+  "riddle": "I have black and white stripes and live in Africa.\nI look like a horse, but I'm wild and free.\nWhat am I?",
+  "answer": "A zebra",
+  "emoji": "🦓"
+}`;
+
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "riddle": { "type": "STRING" },
+                                "answer": { "type": "STRING" },
+                                "emoji": { "type": "STRING" }
+                            },
+                            required: ["riddle", "answer"]
+                        }
+                    }
+                };
+
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("API Error:", errorData);
+                    throw new Error(`API request failed with status ${response.status}. ${errorData?.error?.message || 'Unknown API error'}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0 &&
+                    result.candidates[0].content.parts[0].text) {
+                    
+                    const generatedJsonText = result.candidates[0].content.parts[0].text;
+                    const generatedContent = JSON.parse(generatedJsonText);
+
+                    if (generatedContent.riddle && generatedContent.answer) {
+                        displayRiddle({
+                            riddle: generatedContent.riddle,
+                            answer: generatedContent.answer,
+                            emoji: generatedContent.emoji || ""
+                        });
+                    } else {
+                        console.error("Invalid riddle format from API:", generatedContent);
+                        throw new Error("Invalid riddle format received from API.");
+                    }
+                } else {
+                    console.error("Unexpected API response structure:", result);
+                    throw new Error("Couldn't generate a riddle from the API. The response was not as expected.");
+                }
+
+            } catch (error) {
+                console.error('Error generating themed riddle:', error);
+                errorMessageElement.innerText = `Oops! Failed to get a riddle: ${error.message}. Try an initial riddle or a different theme.`;
+                errorMessageElement.style.display = 'block';
+                getNewInitialRiddle();
+            } finally {
+                loadingMessageElement.style.display = 'none';
+                generateThemeRiddleBtn.disabled = false;
+            }
+        }
+
+        // Event Listeners
+        showAnswerBtn.addEventListener('click', showAnswer);
+        newRiddleBtn.addEventListener('click', getNewInitialRiddle);
+        generateThemeRiddleBtn.addEventListener('click', generateRiddleByTheme);
+
+        gotItRightBtn.addEventListener('click', () => {
+            playCorrectSound();
+            feedbackAreaElement.style.display = 'none'; // Hide after click
+        });
+
+        missedItBtn.addEventListener('click', () => {
+            playIncorrectSound();
+            feedbackAreaElement.style.display = 'none'; // Hide after click
+        });
+
+        // Initialize
+        populateThemes();
+        getNewInitialRiddle(); 
+    </script>
+</body>
+</html>
