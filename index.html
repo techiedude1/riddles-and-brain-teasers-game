@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,8 @@
     <style>
         body {
             font-family: 'Baloo 2', cursive;
-            background-color: #f0f9ff;
-            color: #1e3a8a;
+            background-color: #f0f9ff; /* Light blue background */
+            color: #1e3a8a; /* Dark blue text */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,7 +32,7 @@
         .riddle-area, .answer-area, .theme-area, .feedback-area {
             margin-bottom: 1.5rem;
             padding: 1.5rem;
-            background-color: #e0f2fe;
+            background-color: #e0f2fe; /* Lighter blue for sections */
             border-radius: 15px;
             min-height: 80px;
             display: flex;
@@ -45,18 +45,18 @@
             padding: 1rem;
         }
         .riddle-text {
-            font-size: 1.5rem;
+            font-size: 1.5rem; /* Larger font for riddle */
             line-height: 1.6;
-            color: #0c4a6e;
-            white-space: pre-line;
+            color: #0c4a6e; /* Darker blue for riddle text */
+            white-space: pre-line; /* Preserve line breaks in riddles */
         }
         .answer-text {
             font-size: 1.4rem;
             font-weight: 600;
-            color: #15803d;
+            color: #15803d; /* Green for answer */
         }
         .button {
-            background-color: #2563eb;
+            background-color: #2563eb; /* Primary blue */
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 10px;
@@ -67,9 +67,10 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
             margin: 0.5rem;
             box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+            text-decoration: none; /* Ensure links styled as buttons don't have underlines */
         }
         .button:hover {
-            background-color: #1d4ed8;
+            background-color: #1d4ed8; /* Darker blue on hover */
             transform: translateY(-2px);
         }
         .button:active {
@@ -80,13 +81,13 @@
             cursor: not-allowed;
         }
         .theme-button {
-            background-color: #fb923c;
+            background-color: #fb923c; /* Orange for theme buttons */
         }
         .theme-button:hover {
-            background-color: #f97316;
+            background-color: #f97316; /* Darker orange */
         }
         .theme-button.selected {
-            background-color: #ea580c;
+            background-color: #ea580c; /* Even darker orange for selected */
             box-shadow: 0 0 0 3px #fdba74;
         }
         .feedback-button {
@@ -108,7 +109,7 @@
         .title {
             font-size: 2.8rem;
             font-weight: 700;
-            color: #1e3a8a;
+            color: #1e3a8a; /* Dark blue */
             margin-bottom: 1.5rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
@@ -134,7 +135,7 @@
         .footer-text {
             margin-top: 2rem;
             font-size: 0.9rem;
-            color: #6b7280;
+            color: #6b7280; /* Gray for footer */
         }
         #resetSeenRiddlesBtn {
             background-color: #6b7280;
@@ -144,7 +145,27 @@
         #resetSeenRiddlesBtn:hover {
             background-color: #4b5563;
         }
+        .back-link-button { /* Styles for the new back button */
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem; /* mt-6 */
+            padding-top: 0.875rem; /* py-3.5 approx 0.9rem */
+            padding-bottom: 0.875rem;
+            text-align: center;
+            background-color: #2563eb; /* bg-blue-600 */
+            color: white;
+            border-radius: 8px; /* rounded-lg */
+            font-weight: 600; /* font-semibold */
+            font-size: 1.125rem; /* text-lg, close to 1.15rem */
+            text-decoration: none;
+            transition: background-color 0.3s ease; /* transition-colors duration-300 */
+        }
+        .back-link-button:hover {
+            background-color: #1d4ed8; /* hover:bg-blue-700 */
+        }
 
+
+        /* Mobile responsiveness */
         @media (max-width: 640px) {
             .container { padding: 1.5rem 1rem; }
             .title { font-size: 2.2rem; }
@@ -152,6 +173,7 @@
             .answer-text { font-size: 1.15rem; }
             .button { font-size: 1rem; padding: 0.6rem 1.2rem; }
             .theme-selector { gap: 0.5rem; }
+            .back-link-button { font-size: 1rem; margin-top: 1.25rem;}
         }
     </style>
 </head>
@@ -188,6 +210,11 @@
         <div id="errorMessage" class="error-message" style="display: none;">Oops! Couldn't get a riddle. Try again!</div>
         <div id="infoMessage" class="info-message" style="display: none;"></div>
         <button id="resetSeenRiddlesBtn" class="button" title="Click to see all initial riddles again from the start.">Reset Seen Initial Riddles</button>
+
+        <a href="https://techiedude1.github.io/Curious/"
+           class="back-link-button">
+           Back to My Curiosity Corner
+        </a>
     </div>
 
     <p class="footer-text">Fun & Learning for ages 5-7!</p>
@@ -219,7 +246,7 @@
 
         // Initialize Tone.js synths safely after user interaction or on load
         function initializeSynths() {
-            if (typeof Tone !== 'undefined') {
+            if (typeof Tone !== 'undefined' && Tone.start) { // Check if Tone and Tone.start are available
                 if (!correctSynth) {
                     correctSynth = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "triangle" },
@@ -234,42 +261,59 @@
                     }).toDestination();
                 }
             } else {
-                console.warn("Tone.js not loaded yet. Sounds will not play.");
+                console.warn("Tone.js not loaded or Tone.start not available. Sounds will not play.");
             }
         }
-        // Call initializeSynths once, perhaps on first interaction or load
-        // It's good practice to start audio context on user gesture.
-        // For simplicity here, we'll try on load and rely on browser handling.
+        // Call initializeSynths once on load.
+        // User interaction will be needed to start AudioContext if not already started.
          window.addEventListener('load', initializeSynths);
 
 
-        function playCorrectSound() {
-            if (correctSynth && Tone.context.state !== 'running') {
-                Tone.start(); // Ensure AudioContext is running
+        async function playCorrectSound() { // Made async to handle Tone.start()
+            if (typeof Tone === 'undefined' || !Tone.start) {
+                 console.log("Correct sound! (Tone.js not fully ready)"); return;
             }
-            if (correctSynth) {
-                const now = Tone.now();
-                correctSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", now);
-                correctSynth.triggerAttackRelease("E5", "4n", now + 0.3);
-            } else {
-                console.log("Correct sound!"); // Fallback if Tone.js fails
-            }
-        }
-
-        function playIncorrectSound() {
-             if (incorrectSynth && Tone.context.state !== 'running') {
-                Tone.start();
-            }
-            if (incorrectSynth) {
-                const now = Tone.now();
-                incorrectSynth.triggerAttackRelease(["F#3", "F3"], "8n", now);
-                incorrectSynth.triggerAttackRelease("E3", "4n", now + 0.2);
-            } else {
-                console.log("Incorrect sound!"); // Fallback
+            try {
+                if (Tone.context.state !== 'running') {
+                    await Tone.start(); // Ensure AudioContext is running
+                }
+                if (correctSynth) {
+                    const now = Tone.now();
+                    correctSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", now);
+                    correctSynth.triggerAttackRelease("E5", "4n", now + 0.3);
+                } else {
+                    initializeSynths(); // Try to re-initialize if synth is missing
+                    if(correctSynth) playCorrectSound(); // and retry
+                    else console.log("Correct sound! (Synth not initialized)");
+                }
+            } catch (error) {
+                console.error("Error playing correct sound:", error);
             }
         }
 
+        async function playIncorrectSound() { // Made async to handle Tone.start()
+            if (typeof Tone === 'undefined' || !Tone.start) {
+                 console.log("Incorrect sound! (Tone.js not fully ready)"); return;
+            }
+            try {
+                if (Tone.context.state !== 'running') {
+                    await Tone.start();
+                }
+                if (incorrectSynth) {
+                    const now = Tone.now();
+                    incorrectSynth.triggerAttackRelease(["F#3", "F3"], "8n", now);
+                    incorrectSynth.triggerAttackRelease("E3", "4n", now + 0.2);
+                } else {
+                     initializeSynths(); // Try to re-initialize
+                     if(incorrectSynth) playIncorrectSound(); // and retry
+                     else console.log("Incorrect sound! (Synth not initialized)");
+                }
+            } catch (error) {
+                console.error("Error playing incorrect sound:", error);
+            }
+        }
 
+        // Initial riddles array (condensed for brevity in this explanation)
         const initialRiddles = [
             { id: 1, riddle: "I have a long neck and spots all over.\nI love to eat leaves from the tallest trees.\nWhat am I?", answer: "A giraffe", emoji: "🦒", category: "Animals" },
             { id: 2, riddle: "I am round and I bounce.\nYou can kick me or throw me.\nWhat am I?", answer: "A ball", emoji: "⚽", category: "Toys" },
@@ -284,7 +328,7 @@
             { id: 11, riddle: "I have a fluffy tail and I like to hop.\nI love carrots and wiggle my nose a lot.\nWhat am I?", answer: "A bunny", emoji: "🐰", category: "Animals" },
             { id: 12, riddle: "I light up the sky at night.\nSometimes I'm full, sometimes a crescent.\nWhat am I?", answer: "The moon", emoji: "🌙", category: "Nature" },
             { id: 13, riddle: "I have keys but open no locks.\nI have space but no room.\nYou can enter, but not go outside.\nWhat am I?", answer: "A keyboard", emoji: "⌨️", category: "Technology" },
-            { id: 14, riddle: "What has an eye, but cannot see?", answer: "A needle", emoji: "🧵", category: "Objects" },
+            { id: 14, riddle: "What has an eye, but cannot see?", answer: "A needle", emoji: "�", category: "Objects" },
             { id: 15, riddle: "I am full of holes but still hold water.\nWhat am I?", answer: "A sponge", emoji: "🧽", category: "Household" },
             { id: 16, riddle: "I have a horn but cannot beep.\nI am a mythical creature, often white and pure.\nWhat am I?", answer: "A unicorn", emoji: "🦄", category: "Fantasy" },
             { id: 17, riddle: "I grow on a vine and can be red or green.\nYou can eat me or drink my juice.\nWhat am I?", answer: "Grapes", emoji: "🍇", category: "Food" },
@@ -340,7 +384,7 @@
         }
 
         function getNewInitialRiddle() {
-            initializeSynths(); // Ensure synths are ready
+            // initializeSynths(); // Synths are initialized on load, and Tone.start() is handled in play functions
             let seenRiddleIds = getSeenRiddles();
             let availableRiddles = initialRiddles.filter(r => !seenRiddleIds.includes(r.id));
 
@@ -351,10 +395,10 @@
                 seenRiddleIds = [];
                 availableRiddles = initialRiddles;
             }
-             if (availableRiddles.length === 0 && initialRiddles.length > 0) {
+             if (availableRiddles.length === 0 && initialRiddles.length > 0) { // This case should ideally be covered by the reset above
                 displayRiddle({riddle: "Wow, you're a riddle master! Try generating a themed riddle.", answer: "Great job!", emoji: "🏆"});
                 return;
-            } else if (initialRiddles.length === 0) {
+            } else if (initialRiddles.length === 0) { // Should not happen with the current setup
                  displayRiddle({riddle: "No initial riddles loaded. Try a themed riddle!", answer: "", emoji: "🤔"});
                 return;
             }
@@ -387,7 +431,7 @@
         }
 
         async function generateRiddleByTheme() {
-            initializeSynths(); // Ensure synths are ready
+            // initializeSynths(); // Synths are initialized on load
             if (!selectedTheme) {
                 errorMessageElement.innerText = "Please select a theme first!";
                 errorMessageElement.style.display = 'block';
@@ -437,7 +481,7 @@ Example for theme "Animals":
                     }
                 };
 
-                const apiKey = "";
+                const apiKey = ""; // API key will be injected by the environment if needed
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
                 const response = await fetch(apiUrl, {
@@ -460,17 +504,22 @@ Example for theme "Animals":
                     result.candidates[0].content.parts[0].text) {
                     
                     const generatedJsonText = result.candidates[0].content.parts[0].text;
-                    const generatedContent = JSON.parse(generatedJsonText);
-
-                    if (generatedContent.riddle && generatedContent.answer) {
-                        displayRiddle({
-                            riddle: generatedContent.riddle,
-                            answer: generatedContent.answer,
-                            emoji: generatedContent.emoji || ""
-                        });
-                    } else {
-                        console.error("Invalid riddle format from API:", generatedContent);
-                        throw new Error("Invalid riddle format received from API.");
+                    // Attempt to parse the JSON, ensure it's valid
+                    try {
+                        const generatedContent = JSON.parse(generatedJsonText);
+                        if (generatedContent.riddle && generatedContent.answer) {
+                            displayRiddle({
+                                riddle: generatedContent.riddle,
+                                answer: generatedContent.answer,
+                                emoji: generatedContent.emoji || ""
+                            });
+                        } else {
+                            console.error("Invalid riddle format from API (missing riddle/answer):", generatedContent);
+                            throw new Error("Invalid riddle format received from API.");
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing JSON from API:", parseError, "Raw text:", generatedJsonText);
+                        throw new Error("Received malformed riddle data from the API.");
                     }
                 } else {
                     console.error("Unexpected API response structure:", result);
@@ -481,10 +530,11 @@ Example for theme "Animals":
                 console.error('Error generating themed riddle:', error);
                 errorMessageElement.innerText = `Oops! Failed to get a riddle: ${error.message}. Try an initial riddle or a different theme.`;
                 errorMessageElement.style.display = 'block';
+                // Fallback to an initial riddle if API fails
                 getNewInitialRiddle();
             } finally {
                 loadingMessageElement.style.display = 'none';
-                generateThemeRiddleBtn.disabled = false;
+                generateThemeRiddleBtn.disabled = false; // Re-enable button
             }
         }
 
@@ -509,3 +559,4 @@ Example for theme "Animals":
     </script>
 </body>
 </html>
+�
